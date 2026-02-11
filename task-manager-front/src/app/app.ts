@@ -1,12 +1,44 @@
-import { Component, signal } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { HttpClientModule } from '@angular/common/http';
+import { TaskService } from './task.service';
+import { Task } from './task.model';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet],
-  templateUrl: './app.html',
-  styleUrl: './app.css'
+  standalone: true,
+  imports: [CommonModule, FormsModule, HttpClientModule],
+  templateUrl: './app.component.html'
 })
-export class App {
-  protected readonly title = signal('task-manager-front');
+export class AppComponent implements OnInit {
+  tasks: Task[] = [];
+  newTask = '';
+
+  constructor(private taskService: TaskService) {}
+
+  ngOnInit() {
+    this.loadTasks();
+  }
+
+  loadTasks() {
+    this.taskService.getTasks().subscribe(tasks => {
+      this.tasks = tasks;
+    });
+  }
+
+  addTask() {
+    if (!this.newTask.trim()) return;
+
+    this.taskService.addTask(this.newTask).subscribe(() => {
+      this.newTask = '';
+      this.loadTasks();
+    });
+  }
+
+  toggleTask(task: Task) {
+    this.taskService.toggleTask(task).subscribe(() => {
+      this.loadTasks();
+    });
+  }
 }
