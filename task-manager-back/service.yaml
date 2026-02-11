@@ -3,7 +3,7 @@ kind: Service
 metadata:
   name: task-manager-back-service
 spec:
-  type: NodePort
+  type: ClusterIP
   selector:
     app: task-manager-back
   ports:
