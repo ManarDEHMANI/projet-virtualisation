@@ -9,9 +9,9 @@ import { Task } from './task.model';
   selector: 'app-root',
   standalone: true,
   imports: [CommonModule, FormsModule, HttpClientModule],
-  templateUrl: './app.component.html'
+  templateUrl: './app.html'
 })
-export class AppComponent implements OnInit {
+export class App implements OnInit {
   tasks: Task[] = [];
   newTask = '';
 
