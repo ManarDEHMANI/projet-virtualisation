@@ -1,13 +1,12 @@
 const express = require('express');
+const cors = require('cors');
+
 const app = express();
+app.use(cors());
+app.use(express.json());
 
-app.get('/tasks', (req, res) => {
-  res.json([
-    { id: 1, title: 'Première tâche', completed: false }
-  ]);
-});
+app.use('/api/tasks', require('./routes/task.routes'));
 
-const PORT = 3000;
-app.listen(PORT, () => {
-  console.log(`Service running on port ${PORT}`);
+app.listen(3000, () => {
+  console.log('Backend running on port 3000');
 });

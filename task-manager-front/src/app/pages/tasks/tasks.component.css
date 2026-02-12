@@ -1,0 +1,54 @@
+.container {
+    max-width: 500px;
+    margin: 50px auto;
+    padding: 20px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  }
+  
+  h1 {
+    text-align: center;
+  }
+  
+  .add-task {
+    display: flex;
+    gap: 10px;
+  }
+  
+  input {
+    flex: 1;
+    padding: 8px;
+  }
+  
+  button {
+    padding: 8px 12px;
+    cursor: pointer;
+  }
+  
+  ul {
+    list-style: none;
+    padding: 0;
+    margin-top: 20px;
+  }
+  
+  li {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px;
+    background: white;
+    margin-bottom: 5px;
+    border-radius: 4px;
+  }
+  
+  li.done span {
+    text-decoration: line-through;
+    color: gray;
+  }
+  
+  .delete {
+    background: red;
+    color: white;
+    border: none;
+  }
+  
