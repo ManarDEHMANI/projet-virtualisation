@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: task-manager-front
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: task-manager-front
+  template:
+    metadata:
+      labels:
+        app: task-manager-front
+    spec:
+      containers:
+        - image: dehmanim/task-manager-front:1.0
+          imagePullPolicy: IfNotPresent
+          name: task-manager-front
+          ports:
+            - containerPort: 4200
+      restartPolicy: Always
