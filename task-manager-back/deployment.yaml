@@ -14,7 +14,25 @@ spec:
     spec:
       containers:
         - name: task-manager-back
-          image: task-manager-back
-          imagePullPolicy: IfNotPresent
+          image: dehmanim/task-manager-back:1.0
+          imagePullPolicy: Always
           ports:
             - containerPort: 3000
+          env:
+            - name: DB_HOST
+              value: task-manager-mysql-service
+            - name: DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: task-manager-mysql-secret
+                  key: mysql-user
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: task-manager-mysql-secret
+                  key: mysql-password
+            - name: DB_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: task-manager-mysql-secret
+                  key: mysql-database
