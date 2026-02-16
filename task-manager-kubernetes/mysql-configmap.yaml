@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: task-manager-mysql-init
+data:
+  init.sql: |
+    CREATE DATABASE IF NOT EXISTS taskmanagerdb;
+    USE taskmanagerdb;
+
+    CREATE TABLE IF NOT EXISTS tasks (
+      id BIGINT PRIMARY KEY AUTO_INCREMENT,
+      title VARCHAR(255),
+      completed BOOLEAN DEFAULT false
+    );
