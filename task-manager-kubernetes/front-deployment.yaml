@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - image: dehmanim/task-manager-front:1.0
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Always
           name: task-manager-front
           ports:
             - containerPort: 4200
