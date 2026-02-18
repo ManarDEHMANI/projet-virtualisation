@@ -20,19 +20,14 @@ spec:
             - containerPort: 3000
           env:
             - name: DB_HOST
-              value: task-manager-mysql-service
+              value: task-manager-mysql
             - name: DB_USER
-              valueFrom:
-                secretKeyRef:
-                  name: task-manager-mysql-secret
-                  key: mysql-user
+              value: root
             - name: DB_PASSWORD
               valueFrom:
                 secretKeyRef:
                   name: task-manager-mysql-secret
-                  key: mysql-password
+                  key: mysql-root-password
             - name: DB_NAME
-              valueFrom:
-                secretKeyRef:
-                  name: task-manager-mysql-secret
-                  key: mysql-database
+              value: taskmanagerdb
+

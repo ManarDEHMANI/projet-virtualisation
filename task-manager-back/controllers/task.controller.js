@@ -1,4 +1,4 @@
-
+const connection = require('./db');
 
 exports.getTasks = (req, res) => {
   connection.query('SELECT * FROM tasks', (err, results) => {
