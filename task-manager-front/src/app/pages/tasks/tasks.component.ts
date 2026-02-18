@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
@@ -15,14 +15,16 @@ import { Task } from '../../core/models/task.model';
   templateUrl: './tasks.component.html',
   styleUrls: ['./tasks.component.css']
 })
-export class TasksComponent {
+export class TasksComponent implements OnInit  {
   tasks: Task[] = [];
   newTaskTitle = '';
 
   constructor(private taskService: TaskService) {
+  }
+  ngOnInit() {
     this.loadTasks();
   }
-
+  
   loadTasks() {
     this.taskService.getTasks().subscribe(tasks => {
       this.tasks = tasks;

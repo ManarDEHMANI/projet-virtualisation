@@ -3,9 +3,9 @@ kind: Service
 metadata:
   name: task-manager-front-service
 spec:
-  type: NodePort
+  type: ClusterIP
   selector:
     app: task-manager-front
   ports:
-    - port: 4200
-      targetPort: 4200
+    - port: 80
+      targetPort: 80
