@@ -1,53 +1,74 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-
 import { TaskService } from '../../core/services/task.service';
 import { Task } from '../../core/models/task.model';
 
 @Component({
   selector: 'app-tasks',
   standalone: true,
-  imports: [
-    CommonModule,
-    FormsModule
-  ],
+  imports: [CommonModule, FormsModule],
   templateUrl: './tasks.component.html',
   styleUrls: ['./tasks.component.css']
 })
-export class TasksComponent implements OnInit  {
-  tasks: Task[] = [];
+export class TasksComponent {
+
+  private taskService = inject(TaskService);
+
   newTaskTitle = '';
 
-  constructor(private taskService: TaskService) {
-  }
-  ngOnInit() {
-    this.loadTasks();
-  }
-  
-  loadTasks() {
-    this.taskService.getTasks().subscribe(tasks => {
-      this.tasks = tasks;
+  tasks = signal<Task[]>([]);
+
+  constructor() {
+    this.taskService.getTasks().subscribe({
+      next: (tasks) => this.tasks.set(tasks),
+      error: (err) => console.error(err)
     });
   }
 
-  addTask() {
+  addTask(): void {
     if (!this.newTaskTitle.trim()) return;
 
-    this.taskService.addTask(this.newTaskTitle).subscribe(() => {
-      this.newTaskTitle = '';
-      this.loadTasks();
+    const title = this.newTaskTitle;
+
+    this.taskService.addTask(title).subscribe({
+      next: (createdTask) => {
+        this.tasks.update(tasks => [...tasks, createdTask]);
+        this.newTaskTitle = '';
+      },
+      error: (err) => console.error(err)
     });
   }
 
-  toggleTask(task: Task) {
-    task.completed = !task.completed;
-    this.taskService.updateTask(task).subscribe();
+  toggleTask(task: Task): void {
+    const updated = { ...task, completed: !task.completed };
+
+    this.taskService.updateTask(updated).subscribe({
+      next: () => {
+        this.tasks.update(tasks =>
+          tasks.map(t =>
+            t.id === task.id
+              ? { ...t, completed: !t.completed }
+              : t
+          )
+        );
+      },
+      error: (err) => console.error(err)
+    });
   }
 
-  deleteTask(task: Task) {
-    this.taskService.deleteTask(task.id).subscribe(() => {
-      this.loadTasks();
+  deleteTask(id: number): void {
+    this.taskService.deleteTask(id).subscribe({
+      next: () => {
+        this.tasks.update(tasks =>
+          tasks.filter(t => t.id !== id)
+        );
+      },
+      error: (err) => console.error(err)
     });
+  }
+
+  trackById(index: number, task: Task): number {
+    return task.id;
   }
 }

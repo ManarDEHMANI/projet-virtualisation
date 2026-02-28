@@ -4,6 +4,7 @@ import { Task } from '../models/task.model';
 
 @Injectable({ providedIn: 'root' })
 export class TaskService {
+
   private apiUrl = '/api/tasks';
 
   constructor(private http: HttpClient) {}
@@ -13,14 +14,14 @@ export class TaskService {
   }
 
   addTask(title: string) {
-    return this.http.post(this.apiUrl, { title });
+    return this.http.post<Task>(this.apiUrl, { title });
   }
 
   updateTask(task: Task) {
-    return this.http.put(`${this.apiUrl}/${task.id}`, task);
+    return this.http.put<Task>(`${this.apiUrl}/${task.id}`, task);
   }
 
   deleteTask(id: number) {
-    return this.http.delete(`${this.apiUrl}/${id}`);
+    return this.http.delete<void>(`${this.apiUrl}/${id}`);
   }
 }

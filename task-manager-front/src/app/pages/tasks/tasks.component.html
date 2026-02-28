@@ -1,22 +1,49 @@
 <div class="container">
-    <h1>Task Manager</h1>
-  
-    <div class="add-task">
-      <input
-        type="text"
-        placeholder="Nouvelle tâche..."
-        [(ngModel)]="newTaskTitle"
-      />
-      <button (click)="addTask()">Ajouter</button>
-    </div>
-  
-    <ul>
-      <li *ngFor="let task of tasks" [class.done]="task.completed">
-        <span (click)="toggleTask(task)">
-          {{ task.title }}
-        </span>
-        <button class="delete" (click)="deleteTask(task)">✕</button>
+  <h1>Mini Task Manager</h1>
+
+  <!-- FORM propre Angular -->
+  <form class="add-task" (ngSubmit)="addTask()" #taskForm="ngForm">
+    <input
+      type="text"
+      name="title"
+      [(ngModel)]="newTaskTitle"
+      placeholder="Ajouter une tâche..."
+      required
+      autocomplete="off"
+    />
+
+    <button
+      class="icon-btn"
+      type="submit"
+      [disabled]="!newTaskTitle.trim()"
+      aria-label="Ajouter"
+    >
+      <span class="icon">+</span>
+    </button>
+  </form>
+
+  <ul class="task-list">
+    @for (task of tasks(); track task.id) {
+      <li [class.completed]="task.completed">
+    
+        <label class="task-row">
+          <input
+            type="checkbox"
+            [checked]="task.completed"
+            (change)="toggleTask(task)"
+          />
+          <span class="title">{{ task.title }}</span>
+        </label>
+    
+        <button
+          class="icon-btn danger"
+          type="button"
+          (click)="deleteTask(task.id)"
+        >
+          ×
+        </button>
+    
       </li>
-    </ul>
-  </div>
-  
+    }
+  </ul>
+</div>
