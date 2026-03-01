@@ -3,9 +3,16 @@ const connection = require('./db');
 exports.getTasks = (req, res) => {
   connection.query('SELECT * FROM tasks', (err, results) => {
     if (err) return res.status(500).json(err);
-    res.json(results);
+
+    const formatted = results.map(task => ({
+      ...task,
+      completed: !!task.completed
+    }));
+
+    res.json(formatted);
   });
 };
+
 
 
 exports.addTask = (req, res) => {

@@ -3,9 +3,10 @@ kind: Service
 metadata:
   name: task-manager-mysql
 spec:
+  type: ClusterIP
   ports:
     - port: 3306
-  clusterIP: None
+      targetPort: 3306
   selector:
     app: task-manager-mysql
 ---
