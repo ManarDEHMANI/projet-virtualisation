@@ -13,17 +13,21 @@ exports.getUsers = (req, res) => {
 exports.createUser = (req, res) => {
   const { name } = req.body;
 
+  if (!name) {
+    return res.status(400).json({ error: "Name is required" });
+  }
+
   connection.query(
-    'INSERT INTO users (name) VALUES (?)',
+    "INSERT INTO users (name) VALUES (?)",
     [name],
-    (err, results) => {
+    (err, result) => {
       if (err) {
         return res.status(500).json({ error: err.message });
       }
 
       res.status(201).json({
-        message: 'User created',
-        id: results.insertId
+        id: result.insertId,
+        name
       });
     }
   );

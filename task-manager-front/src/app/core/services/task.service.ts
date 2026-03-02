@@ -9,19 +9,30 @@ export class TaskService {
 
   constructor(private http: HttpClient) {}
 
-  getTasks() {
-    return this.http.get<Task[]>(this.apiUrl);
+  getTasks(userId: number) {
+    return this.http.get<Task[]>(`/api/tasks?userId=${userId}`);
+  }
+  
+  addTask(title: string, userId: number) {
+    return this.http.post<Task>('/api/tasks', {
+      title,
+      userId
+    });
+  }
+  
+  updateTask(task: Task, userId: number) {
+    return this.http.put(`/api/tasks/${task.id}`, {
+      ...task,
+      userId
+    });
+  }
+  
+  deleteTask(id: number, userId: number) {
+    return this.http.delete(`/api/tasks/${id}?userId=${userId}`);
   }
 
-  addTask(title: string) {
-    return this.http.post<Task>(this.apiUrl, { title });
+  createUser(name: string) {
+    return this.http.post<any>('/api/users', { name });
   }
 
-  updateTask(task: Task) {
-    return this.http.put<Task>(`${this.apiUrl}/${task.id}`, task);
-  }
-
-  deleteTask(id: number) {
-    return this.http.delete<void>(`${this.apiUrl}/${id}`);
-  }
 }

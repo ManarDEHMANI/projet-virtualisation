@@ -16,22 +16,33 @@ export class TasksComponent {
   private taskService = inject(TaskService);
 
   newTaskTitle = '';
-
+  userId: number | null = null;
+  username = '';  
   tasks = signal<Task[]>([]);
 
   constructor() {
-    this.taskService.getTasks().subscribe({
+    const stored = localStorage.getItem('userId');
+    if (stored) {
+      this.userId = +stored;
+      this.loadTasks();
+    }
+  }
+
+  loadTasks() {
+    if (!this.userId) return;
+  
+    this.taskService.getTasks(this.userId).subscribe({
       next: (tasks) => this.tasks.set(tasks),
       error: (err) => console.error(err)
     });
   }
 
   addTask(): void {
-    if (!this.newTaskTitle.trim()) return;
-
+    if (!this.newTaskTitle.trim() || !this.userId) return;
+  
     const title = this.newTaskTitle;
-
-    this.taskService.addTask(title).subscribe({
+  
+    this.taskService.addTask(title, this.userId).subscribe({
       next: (createdTask) => {
         this.tasks.update(tasks => [...tasks, createdTask]);
         this.newTaskTitle = '';
@@ -39,11 +50,15 @@ export class TasksComponent {
       error: (err) => console.error(err)
     });
   }
-
   toggleTask(task: Task): void {
-    const updated = { ...task, completed: !task.completed };
-
-    this.taskService.updateTask(updated).subscribe({
+    if (!this.userId) return;
+  
+    const updated = {
+      ...task,
+      completed: !task.completed
+    };
+  
+    this.taskService.updateTask(updated, this.userId).subscribe({
       next: () => {
         this.tasks.update(tasks =>
           tasks.map(t =>
@@ -58,7 +73,9 @@ export class TasksComponent {
   }
 
   deleteTask(id: number): void {
-    this.taskService.deleteTask(id).subscribe({
+    if (!this.userId) return;
+  
+    this.taskService.deleteTask(id, this.userId).subscribe({
       next: () => {
         this.tasks.update(tasks =>
           tasks.filter(t => t.id !== id)
@@ -67,8 +84,25 @@ export class TasksComponent {
       error: (err) => console.error(err)
     });
   }
-
   trackById(index: number, task: Task): number {
     return task.id;
   }
+  createUser() {
+    if (!this.username.trim()) return;
+  
+    this.taskService.createUser(this.username).subscribe({
+      next: (user) => {
+        this.userId = user.id;
+        localStorage.setItem('userId', String(user.id));
+        this.loadTasks();
+      },
+      error: (err) => console.error(err)
+    });
+  }
+  logout() {
+    localStorage.removeItem('userId');
+    this.userId = null;
+    this.tasks.set([]);
+  }
+  
 }

@@ -1,49 +1,86 @@
 <div class="container">
   <h1>Mini Task Manager</h1>
 
-  <!-- FORM propre Angular -->
-  <form class="add-task" (ngSubmit)="addTask()" #taskForm="ngForm">
-    <input
-      type="text"
-      name="title"
-      [(ngModel)]="newTaskTitle"
-      placeholder="Ajouter une tâche..."
-      required
-      autocomplete="off"
-    />
+  <!-- ===== USER SECTION ===== -->
 
-    <button
-      class="icon-btn"
-      type="submit"
-      [disabled]="!newTaskTitle.trim()"
-      aria-label="Ajouter"
-    >
-      <span class="icon">+</span>
-    </button>
-  </form>
+  <div *ngIf="!userId" class="user-section">
+    <h2>Créer un utilisateur</h2>
 
-  <ul class="task-list">
-    @for (task of tasks(); track task.id) {
-      <li [class.completed]="task.completed">
-    
-        <label class="task-row">
-          <input
-            type="checkbox"
-            [checked]="task.completed"
-            (change)="toggleTask(task)"
-          />
-          <span class="title">{{ task.title }}</span>
-        </label>
-    
-        <button
-          class="icon-btn danger"
-          type="button"
-          (click)="deleteTask(task.id)"
-        >
-          ×
-        </button>
-    
-      </li>
-    }
-  </ul>
+    <form (ngSubmit)="createUser()" #userForm="ngForm" class="add-task">
+      <input
+        type="text"
+        name="username"
+        [(ngModel)]="username"
+        placeholder="Votre nom..."
+        required
+        autocomplete="off"
+      />
+
+      <button
+        class="icon-btn"
+        type="submit"
+        [disabled]="!username.trim()"
+      >
+        OK
+      </button>
+    </form>
+  </div>
+
+  <!-- ===== TASK SECTION ===== -->
+
+  <div *ngIf="userId">
+
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+      <p><strong>Utilisateur ID:</strong> {{ userId }}</p>
+      <button class="icon-btn danger" (click)="logout()">⎋</button>
+    </div>
+
+    <!-- FORM ADD TASK -->
+    <form class="add-task" (ngSubmit)="addTask()" #taskForm="ngForm">
+      <input
+        type="text"
+        name="title"
+        [(ngModel)]="newTaskTitle"
+        placeholder="Ajouter une tâche..."
+        required
+        autocomplete="off"
+      />
+
+      <button
+        class="icon-btn"
+        type="submit"
+        [disabled]="!newTaskTitle.trim()"
+        aria-label="Ajouter"
+      >
+        <span class="icon">+</span>
+      </button>
+    </form>
+
+    <!-- TASK LIST -->
+    <ul class="task-list">
+      @for (task of tasks(); track task.id) {
+        <li [class.completed]="task.completed">
+
+          <label class="task-row">
+            <input
+              type="checkbox"
+              [checked]="task.completed"
+              (change)="toggleTask(task)"
+            />
+            <span class="title">{{ task.title }}</span>
+          </label>
+
+          <button
+            class="icon-btn danger"
+            type="button"
+            (click)="deleteTask(task.id)"
+          >
+            ×
+          </button>
+
+        </li>
+      }
+    </ul>
+
+  </div>
 </div>
