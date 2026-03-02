@@ -8,16 +8,22 @@ spec:
     - host: taskmanager.local
       http:
         paths:
-          - path: /api
+
+          - path: /api/tasks
             pathType: Prefix
             backend:
               service:
                 name: task-manager-back-service
                 port:
                   number: 3000
-              name: task-manager-back-user-service
-              port:
-                number: 3000
+
+          - path: /api/users
+            pathType: Prefix
+            backend:
+              service:
+                name: task-manager-back-user-service
+                port:
+                  number: 3000
 
           - path: /
             pathType: Prefix

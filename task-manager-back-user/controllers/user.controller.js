@@ -1,20 +1,30 @@
-const db = require('./db');
+const connection = require('./db');
 
-exports.getUsers = async (req, res) => {
-  try {
-    const [rows] = await db.query("SELECT * FROM users");
-    res.json(rows);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
+exports.getUsers = (req, res) => {
+  connection.query('SELECT * FROM users', (err, results) => {
+    if (err) {
+      return res.status(500).json({ error: err.message });
+    }
+
+    res.json(results);
+  });
 };
 
-exports.createUser = async (req, res) => {
+exports.createUser = (req, res) => {
   const { name } = req.body;
-  try {
-    await db.query("INSERT INTO users (name) VALUES (?)", [name]);
-    res.status(201).json({ message: "User created" });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
+
+  connection.query(
+    'INSERT INTO users (name) VALUES (?)',
+    [name],
+    (err, results) => {
+      if (err) {
+        return res.status(500).json({ error: err.message });
+      }
+
+      res.status(201).json({
+        message: 'User created',
+        id: results.insertId
+      });
+    }
+  );
 };

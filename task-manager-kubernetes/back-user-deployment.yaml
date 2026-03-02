@@ -1,7 +1,8 @@
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: task-manager-user
+  name: task-manager-back-user
 spec:
   replicas: 1
   selector:
@@ -15,5 +16,18 @@ spec:
       containers:
         - name: task-manager-back-user
           image: dehmanim/task-manager-back-user:1.0
+          imagePullPolicy: Always
           ports:
             - containerPort: 3000
+          env:
+            - name: DB_HOST
+              value: task-manager-mysql
+            - name: DB_USER
+              value: root
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: task-manager-mysql-secret
+                  key: mysql-root-password
+            - name: DB_NAME
+              value: taskmanagerdb
