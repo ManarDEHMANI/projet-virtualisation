@@ -1,19 +1,21 @@
 const connection = require('./db');
 
 exports.getTasks = (req, res) => {
-  const userId = req.query.userId;
+
+  const { userId } = req.query;
 
   if (!userId) {
-    return res.status(400).json({ error: 'userId is required' });
+    return res.status(400).json({ error: "userId required" });
   }
 
   connection.query(
     'SELECT * FROM tasks WHERE user_id = ?',
     [userId],
     (err, results) => {
-      if (err) return res.status(500).json({ error: err.message });
 
-      const formatted = results.map((task) => ({
+      if (err) return res.status(500).json(err);
+
+      const formatted = results.map(task => ({
         ...task,
         completed: !!task.completed
       }));
@@ -24,17 +26,19 @@ exports.getTasks = (req, res) => {
 };
 
 exports.addTask = (req, res) => {
+
   const { title, userId } = req.body;
 
-  if (!title || !userId) {
-    return res.status(400).json({ error: 'title and userId are required' });
+  if (!userId) {
+    return res.status(400).json({ error: "userId required" });
   }
 
   connection.query(
     'INSERT INTO tasks (title, completed, user_id) VALUES (?, ?, ?)',
     [title, false, userId],
     (err, result) => {
-      if (err) return res.status(500).json({ error: err.message });
+
+      if (err) return res.status(500).json(err);
 
       res.status(201).json({
         id: result.insertId,

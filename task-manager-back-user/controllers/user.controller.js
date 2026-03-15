@@ -18,17 +18,31 @@ exports.createUser = (req, res) => {
   }
 
   connection.query(
-    "INSERT INTO users (name) VALUES (?)",
+    "SELECT * FROM users WHERE name = ?",
     [name],
-    (err, result) => {
+    (err, results) => {
       if (err) {
         return res.status(500).json({ error: err.message });
       }
 
-      res.status(201).json({
-        id: result.insertId,
-        name
-      });
+      if (results.length > 0) {
+        return res.json(results[0]);
+      }
+
+      connection.query(
+        "INSERT INTO users (name) VALUES (?)",
+        [name],
+        (err, result) => {
+          if (err) {
+            return res.status(500).json({ error: err.message });
+          }
+
+          res.status(201).json({
+            id: result.insertId,
+            name
+          });
+        }
+      );
     }
   );
 };
