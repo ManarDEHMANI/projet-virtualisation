@@ -1,46 +1,62 @@
 const connection = require('./db');
 
-exports.getUsers = (req, res) => {
-  connection.query('SELECT * FROM users', (err, results) => {
-    if (err) {
-      return res.status(500).json({ error: err.message });
-    }
+exports.getAllUsers = (req, res) => {
 
-    res.json(results);
-  });
+  const { userId } = req.query;
+
+  connection.query(
+    "SELECT * FROM users WHERE id = ?",
+    [userId],
+    (err, results) => {
+
+      if (!results.length || results[0].role !== "admin") {
+        return res.status(403).json({ error: "Access denied" });
+      }
+
+      connection.query(
+        "SELECT id, name, role FROM users",
+        (err, users) => {
+
+          res.json(users);
+
+        }
+      );
+    }
+  );
 };
 
 exports.createUser = (req, res) => {
-  const { name } = req.body;
 
-  if (!name) {
-    return res.status(400).json({ error: "Name is required" });
-  }
+  const { name } = req.body;
 
   connection.query(
     "SELECT * FROM users WHERE name = ?",
     [name],
     (err, results) => {
-      if (err) {
-        return res.status(500).json({ error: err.message });
-      }
 
       if (results.length > 0) {
         return res.json(results[0]);
       }
 
       connection.query(
-        "INSERT INTO users (name) VALUES (?)",
-        [name],
-        (err, result) => {
-          if (err) {
-            return res.status(500).json({ error: err.message });
-          }
+        "SELECT COUNT(*) as count FROM users",
+        (err, countResult) => {
 
-          res.status(201).json({
-            id: result.insertId,
-            name
-          });
+          const role = countResult[0].count === 0 ? "admin" : "user";
+
+          connection.query(
+            "INSERT INTO users (name, role) VALUES (?, ?)",
+            [name, role],
+            (err, result) => {
+
+              res.status(201).json({
+                id: result.insertId,
+                name,
+                role
+              });
+
+            }
+          );
         }
       );
     }

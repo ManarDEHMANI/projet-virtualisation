@@ -35,4 +35,8 @@ export class TaskService {
     return this.http.post<any>('/api/users', { name });
   }
 
+  getAllUsers(userId: number) {
+    return this.http.get<any[]>(`/api/users/all?userId=${userId}`);
+  }
+
 }

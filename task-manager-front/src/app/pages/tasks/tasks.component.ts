@@ -17,13 +17,17 @@ export class TasksComponent {
 
   newTaskTitle = '';
   userId: number | null = null;
+  userRole: string | null = null;
   username = '';  
   tasks = signal<Task[]>([]);
 
   constructor() {
     const stored = localStorage.getItem('userId');
+    const role = localStorage.getItem('userRole');
+  
     if (stored) {
       this.userId = +stored;
+      this.userRole = role;
       this.loadTasks();
     }
   }
@@ -88,21 +92,48 @@ export class TasksComponent {
     return task.id;
   }
   createUser() {
+
     if (!this.username.trim()) return;
   
     this.taskService.createUser(this.username).subscribe({
+  
       next: (user) => {
+  
         this.userId = user.id;
+        this.userRole = user.role;
+  
         localStorage.setItem('userId', String(user.id));
+        localStorage.setItem('userRole', user.role);
+  
         this.loadTasks();
       },
+  
       error: (err) => console.error(err)
+  
     });
+  
+  }
+
+  getAllUsers() {
+
+    if (this.userRole !== 'admin') return;
+  
+    this.taskService.getAllUsers(this.userId!).subscribe({
+  
+      next: (users) => {
+        console.log("Users:", users);
+      },
+  
+      error: (err) => console.error(err)
+  
+    });
+  
   }
   logout() {
     localStorage.removeItem('userId');
+    localStorage.removeItem('userRole');
     this.userId = null;
+    this.userRole = null;
     this.tasks.set([]);
   }
-  
 }

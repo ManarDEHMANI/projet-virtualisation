@@ -27,14 +27,18 @@
   </div>
 
   <!-- ===== TASK SECTION ===== -->
-
   <div *ngIf="userId">
 
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
       <p><strong>Utilisateur ID:</strong> {{ userId }}</p>
       <button class="icon-btn danger" (click)="logout()">⎋</button>
     </div>
-
+    <!-- SECTION ADMIN -->
+    <div *ngIf="userRole === 'admin'" style="margin-bottom:15px">
+      <button class="icon-btn" (click)="getAllUsers()">
+        Voir tous les utilisateurs
+      </button>
+    </div>
     <!-- FORM ADD TASK -->
     <form class="add-task" (ngSubmit)="addTask()" #taskForm="ngForm">
       <input
