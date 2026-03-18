@@ -7,15 +7,23 @@
 
     <h2>Créer un utilisateur</h2>
   
-    <input
-      type="text"
-      [(ngModel)]="username"
-      placeholder="Votre nom..."
-    />
+    <form class="add-task" (ngSubmit)="createUser()">
+      <input
+        type="text"
+        [(ngModel)]="username"
+        name="username"
+        placeholder="Votre nom..."
+        required
+      />
   
-    <button (click)="createUser()">
-      OK
-    </button>
+      <button
+        class="icon-btn"
+        type="submit"
+        [disabled]="!username.trim()"
+      >
+        <span class="icon">ok</span>
+      </button>
+    </form>
   
   </div>
 
@@ -31,7 +39,7 @@
     </div>
     <!-- SECTION ADMIN -->
     <div *ngIf="userRole === 'admin'" style="margin-bottom:15px">
-      <button class="icon-btn" (click)="getAllUsers()">
+      <button class="primary-btn" (click)="getAllUsers()">
         Voir tous les utilisateurs
       </button>
     </div>
@@ -40,9 +48,25 @@
       <h3>Liste des utilisateurs</h3>
     
       <ul>
-        @for (user of users(); track user.id) {
-          <li>
+        @for (user of users(); track user.userId) {
+          <li style="margin-bottom:12px;">
+    
             <strong>{{ user.name }}</strong> ({{ user.role }})
+    
+            <!-- Sous-liste des tâches -->
+            <ul *ngIf="user.tasks?.length > 0" style="margin-top:6px; padding-left:20px;">
+              @for (task of user.tasks; track task.id) {
+                <li>
+                  {{ task.title }}
+                </li>
+              }
+            </ul>
+    
+            <div *ngIf="!user.tasks || user.tasks.length === 0" 
+                 style="margin-top:6px; padding-left:20px; color:#9ca3af;">
+              Aucune tâche
+            </div>
+    
           </li>
         }
       </ul>

@@ -43,5 +43,9 @@ export class TaskService {
     return this.http.get<any[]>(`/api/tasks/admin?userId=${userId}`);
   }
 
-  
+  getAllTasksGrouped(userId: number) {
+    return this.http.get<any[]>(`/api/tasks/admin?userId=${userId}`);
+  }
+
+
 }

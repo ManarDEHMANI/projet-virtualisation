@@ -23,6 +23,7 @@ export class TasksComponent {
   tasks = signal<Task[]>([]);
   users = signal<any[]>([]);
   adminTasks = signal<any[]>([]);
+  groupedTasks = signal<any[]>([]);
 
   showUsers = false;
 
@@ -129,7 +130,7 @@ export class TasksComponent {
 
     if (this.userId === null || this.userRole !== 'admin') return;
   
-    this.taskService.getAllUsers(this.userId).subscribe({
+    this.taskService.getAllTasksGrouped(this.userId).subscribe({
   
       next: (users) => {
   
@@ -147,6 +148,15 @@ export class TasksComponent {
   loadAdminTasks() {
     this.taskService.getAdminTasks(this.userId!).subscribe({
       next: (data) => this.adminTasks.set(data)
+    });
+  }
+  loadGroupedTasks() {
+    if (this.userId === null) return;
+  
+    this.taskService.getAllTasksGrouped(this.userId).subscribe({
+      next: (data) => {
+        this.groupedTasks.set(data);
+      }
     });
   }
   logout() {

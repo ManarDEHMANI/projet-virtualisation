@@ -149,6 +149,26 @@ h1 {
   margin-bottom: 10px;
 }
 
+.primary-btn {
+  padding: 10px 16px;
+  border-radius: 10px;
+  border: 1px solid #e5e7eb;
+  background: #2563eb;
+  color: white;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.primary-btn:hover {
+  background: #1e40af;
+}
+
+.primary-btn:active {
+  transform: scale(0.98);
+}
+
 /* Logout Button */
 
 .container p {

@@ -8,61 +8,22 @@ exports.getTasks = (req, res) => {
     return res.status(400).json({ error: "userId required" });
   }
 
-  // Step 1: Get user role
   connection.query(
-    "SELECT role FROM users WHERE id = ?",
+    "SELECT * FROM tasks WHERE user_id = ?",
     [userId],
-    (err, userResults) => {
+    (err, results) => {
 
       if (err) return res.status(500).json({ error: err.message });
 
-      if (!userResults.length) {
-        return res.status(404).json({ error: "User not found" });
-      }
+      const formatted = results.map(task => ({
+        ...task,
+        completed: !!task.completed
+      }));
 
-      const role = userResults[0].role;
-
-      // Step 2: If admin → get all tasks
-      if (role === "admin") {
-
-        connection.query(
-          "SELECT * FROM tasks",
-          (err, results) => {
-
-            if (err) return res.status(500).json({ error: err.message });
-
-            const formatted = results.map(task => ({
-              ...task,
-              completed: !!task.completed
-            }));
-
-            res.json(formatted);
-          }
-        );
-
-      } else {
-
-        // Step 3: Normal user → only his tasks
-        connection.query(
-          "SELECT * FROM tasks WHERE user_id = ?",
-          [userId],
-          (err, results) => {
-
-            if (err) return res.status(500).json({ error: err.message });
-
-            const formatted = results.map(task => ({
-              ...task,
-              completed: !!task.completed
-            }));
-
-            res.json(formatted);
-          }
-        );
-      }
+      res.json(formatted);
     }
   );
 };
-
 exports.addTask = (req, res) => {
 
   const { title, userId } = req.body;
@@ -150,15 +111,45 @@ exports.getAllTasksGrouped = (req, res) => {
 
       connection.query(
         `
-        SELECT users.id as userId, users.name, tasks.id as taskId, tasks.title, tasks.completed
+        SELECT 
+          users.id as userId, 
+          users.name, 
+          users.role,
+          tasks.id as taskId, 
+          tasks.title, 
+          tasks.completed
         FROM users
         LEFT JOIN tasks ON users.id = tasks.user_id
         ORDER BY users.id
         `,
         (err, results) => {
 
-          res.json(results);
+          if (err) return res.status(500).json({ error: err.message });
 
+          const grouped = {};
+
+          results.forEach(row => {
+
+            if (!grouped[row.userId]) {
+              grouped[row.userId] = {
+                userId: row.userId,
+                name: row.name,
+                role: row.role,
+                tasks: []
+              };
+            }
+
+            if (row.taskId) {
+              grouped[row.userId].tasks.push({
+                id: row.taskId,
+                title: row.title,
+                completed: !!row.completed
+              });
+            }
+
+          });
+
+          res.json(Object.values(grouped));
         }
       );
     }
