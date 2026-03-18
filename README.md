@@ -105,18 +105,38 @@ Dossier : `task-manager-kubernetes/`
 
 # 🔐 RBAC
 
-Trois rôles Kubernetes sont configurés :
+Une configuration RBAC (Role-Based Access Control) a été mise en place afin de contrôler les permissions des microservices au sein du namespace `task-manager`.
 
-- 👑 Admin → accès complet
-- 👨‍💻 Developer → gestion deployments/services
-- 👀 Viewer → accès lecture seule
+## 📌 ServiceAccounts utilisés
 
-Utilisation de :
-- ServiceAccount
-- Roles
-- RoleBindings
+Les ServiceAccounts suivants ont été créés :
 
----
+- `front-sa` → utilisé par le frontend Angular
+- `back-sa` → utilisé par le microservice Task
+- `back-user-sa` → utilisé par le microservice User
+- `mysql-sa` → utilisé par MySQL
+
+## 📌 Rôles définis
+
+Trois rôles ont été définis dans le namespace :
+
+- `admin-role`
+- `developer-role`
+- `viewer-role`
+
+## 📌 Attribution des permissions
+
+Les permissions sont associées via des RoleBindings :
+
+- `back-sa` → `developer-role`
+- `back-user-sa` → `developer-role`
+- `front-sa` → `viewer-role`
+
+Cette configuration permet :
+
+- Aux services backend de gérer certaines ressources Kubernetes (deployments, services).
+- Au frontend d’avoir un accès en lecture seule.
+- À chaque composant d’être isolé via son propre ServiceAccount.
 
 # ⚙️ Prérequis
 
