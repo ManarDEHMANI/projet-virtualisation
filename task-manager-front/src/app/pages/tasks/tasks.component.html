@@ -4,27 +4,21 @@
   <!-- ===== USER SECTION ===== -->
 
   <div *ngIf="userId === null" class="user-section">
+
     <h2>Créer un utilisateur</h2>
-
-    <form (ngSubmit)="createUser()" #userForm="ngForm" class="add-task">
-      <input
-        type="text"
-        name="username"
-        [(ngModel)]="username"
-        placeholder="Votre nom..."
-        required
-        autocomplete="off"
-      />
-
-      <button
-        class="icon-btn"
-        type="submit"
-        [disabled]="!username.trim()"
-      >
-        OK
-      </button>
-    </form>
+  
+    <input
+      type="text"
+      [(ngModel)]="username"
+      placeholder="Votre nom..."
+    />
+  
+    <button (click)="createUser()">
+      OK
+    </button>
+  
   </div>
+
 
   <!-- ===== TASK SECTION ===== -->
   <div *ngIf="userId !== null">

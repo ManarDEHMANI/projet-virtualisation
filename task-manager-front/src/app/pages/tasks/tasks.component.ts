@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { ChangeDetectorRef, Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TaskService } from '../../core/services/task.service';
@@ -14,7 +14,7 @@ import { Task } from '../../core/models/task.model';
 export class TasksComponent {
 
   private taskService = inject(TaskService);
-
+  private cdr = inject(ChangeDetectorRef);
   newTaskTitle = '';
   userId: number | null = null;
   userRole: string | null = null;
@@ -101,45 +101,47 @@ export class TasksComponent {
     return task.id;
   }
   createUser() {
-
     if (!this.username.trim()) return;
   
-    this.taskService.createUser(this.username).subscribe({
+    const name = this.username;
   
+    this.taskService.createUser(name).subscribe({
       next: (user) => {
   
-        this.userId = user.id;
-        this.userRole = user.role;
         this.currentUserName = user.name;
+        this.userRole = user.role;
   
         localStorage.setItem('userId', String(user.id));
         localStorage.setItem('userRole', user.role);
         localStorage.setItem('username', user.name);
   
+        this.userId = user.id;
+  
+        this.cdr.detectChanges(); 
+  
         this.loadTasks();
         this.username = '';
-  
       },
-  
       error: (err) => console.error(err)
-  
     });
   }
   getAllUsers() {
 
     if (this.userId === null || this.userRole !== 'admin') return;
   
-    this.taskService.getAllUsers(this.userId!).subscribe({
+    this.taskService.getAllUsers(this.userId).subscribe({
   
       next: (users) => {
+  
         this.users.set(users);
         this.showUsers = true;
+  
+        this.cdr.detectChanges(); 
       },
   
       error: (err) => console.error(err)
   
     });
-  
   }
 
   loadAdminTasks() {
