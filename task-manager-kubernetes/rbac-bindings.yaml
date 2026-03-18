@@ -1,26 +1,12 @@
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
-  name: viewer-binding
+  name: back-binding
   namespace: task-manager
 subjects:
-  - kind: Group
-    name: viewers
-    apiGroup: rbac.authorization.k8s.io
-roleRef:
-  kind: Role
-  name: viewer-role
-  apiGroup: rbac.authorization.k8s.io
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: RoleBinding
-metadata:
-  name: developer-binding
-  namespace: task-manager
-subjects:
-  - kind: Group
-    name: developers
-    apiGroup: rbac.authorization.k8s.io
+  - kind: ServiceAccount
+    name: back-sa
+    namespace: task-manager
 roleRef:
   kind: Role
   name: developer-role
@@ -29,13 +15,27 @@ roleRef:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
-  name: admin-binding
+  name: back-user-binding
   namespace: task-manager
 subjects:
-  - kind: Group
-    name: admins
-    apiGroup: rbac.authorization.k8s.io
+  - kind: ServiceAccount
+    name: back-user-sa
+    namespace: task-manager
 roleRef:
   kind: Role
-  name: admin-role
+  name: developer-role
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: front-binding
+  namespace: task-manager
+subjects:
+  - kind: ServiceAccount
+    name: front-sa
+    namespace: task-manager
+roleRef:
+  kind: Role
+  name: viewer-role
   apiGroup: rbac.authorization.k8s.io

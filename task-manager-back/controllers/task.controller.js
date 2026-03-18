@@ -8,19 +8,57 @@ exports.getTasks = (req, res) => {
     return res.status(400).json({ error: "userId required" });
   }
 
+  // Step 1: Get user role
   connection.query(
-    'SELECT * FROM tasks WHERE user_id = ?',
+    "SELECT role FROM users WHERE id = ?",
     [userId],
-    (err, results) => {
+    (err, userResults) => {
 
-      if (err) return res.status(500).json(err);
+      if (err) return res.status(500).json({ error: err.message });
 
-      const formatted = results.map(task => ({
-        ...task,
-        completed: !!task.completed
-      }));
+      if (!userResults.length) {
+        return res.status(404).json({ error: "User not found" });
+      }
 
-      res.json(formatted);
+      const role = userResults[0].role;
+
+      // Step 2: If admin → get all tasks
+      if (role === "admin") {
+
+        connection.query(
+          "SELECT * FROM tasks",
+          (err, results) => {
+
+            if (err) return res.status(500).json({ error: err.message });
+
+            const formatted = results.map(task => ({
+              ...task,
+              completed: !!task.completed
+            }));
+
+            res.json(formatted);
+          }
+        );
+
+      } else {
+
+        // Step 3: Normal user → only his tasks
+        connection.query(
+          "SELECT * FROM tasks WHERE user_id = ?",
+          [userId],
+          (err, results) => {
+
+            if (err) return res.status(500).json({ error: err.message });
+
+            const formatted = results.map(task => ({
+              ...task,
+              completed: !!task.completed
+            }));
+
+            res.json(formatted);
+          }
+        );
+      }
     }
   );
 };

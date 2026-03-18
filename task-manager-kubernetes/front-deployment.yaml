@@ -2,6 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: task-manager-front
+  namespace: task-manager
 spec:
   replicas: 1
   selector:
@@ -12,6 +13,7 @@ spec:
       labels:
         app: task-manager-front
     spec:
+      serviceAccountName: front-sa
       containers:
         - image: dehmanim/task-manager-front:1.0
           imagePullPolicy: Always
