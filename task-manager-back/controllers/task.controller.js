@@ -133,3 +133,34 @@ exports.deleteTask = (req, res) => {
     }
   );
 };
+
+
+exports.getAllTasksGrouped = (req, res) => {
+
+  const { userId } = req.query;
+
+  connection.query(
+    "SELECT role FROM users WHERE id = ?",
+    [userId],
+    (err, userResults) => {
+
+      if (!userResults.length || userResults[0].role !== "admin") {
+        return res.status(403).json({ error: "Access denied" });
+      }
+
+      connection.query(
+        `
+        SELECT users.id as userId, users.name, tasks.id as taskId, tasks.title, tasks.completed
+        FROM users
+        LEFT JOIN tasks ON users.id = tasks.user_id
+        ORDER BY users.id
+        `,
+        (err, results) => {
+
+          res.json(results);
+
+        }
+      );
+    }
+  );
+};

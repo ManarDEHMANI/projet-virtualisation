@@ -3,7 +3,7 @@
 
   <!-- ===== USER SECTION ===== -->
 
-  <div *ngIf="!userId" class="user-section">
+  <div *ngIf="userId === null" class="user-section">
     <h2>Créer un utilisateur</h2>
 
     <form (ngSubmit)="createUser()" #userForm="ngForm" class="add-task">
@@ -27,10 +27,12 @@
   </div>
 
   <!-- ===== TASK SECTION ===== -->
-  <div *ngIf="userId">
+  <div *ngIf="userId !== null">
 
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
-      <p><strong>Utilisateur ID:</strong> {{ userId }}</p>
+      <p>
+        <strong>{{ currentUserName }}</strong> (ID: {{ userId }})
+      </p>
       <button class="icon-btn danger" (click)="logout()">⎋</button>
     </div>
     <!-- SECTION ADMIN -->
@@ -38,6 +40,19 @@
       <button class="icon-btn" (click)="getAllUsers()">
         Voir tous les utilisateurs
       </button>
+    </div>
+    <div *ngIf="showUsers" style="margin-bottom:20px">
+
+      <h3>Liste des utilisateurs</h3>
+    
+      <ul>
+        @for (user of users(); track user.id) {
+          <li>
+            <strong>{{ user.name }}</strong> ({{ user.role }})
+          </li>
+        }
+      </ul>
+    
     </div>
     <!-- FORM ADD TASK -->
     <form class="add-task" (ngSubmit)="addTask()" #taskForm="ngForm">
