@@ -1,96 +1,135 @@
-# 🗂 Mini Task Manager – Kubernetes Fullstack Project
+# 🗂 Mini Task Manager – Kubernetes Microservices Project
 
-Mini Task Manager est une application web complète permettant de gérer des tâches :
+Mini Task Manager est une application fullstack déployée sur Kubernetes avec une architecture microservices.
 
-- ➕ Ajouter une tâche
-- ✏️ Modifier une tâche
-- ❌ Supprimer une tâche
-- 📋 Lister les tâches
+Le projet comprend :
 
-Le projet est entièrement conteneurisé et déployé sur Kubernetes.
+- Un frontend Angular
+- Deux microservices backend (Task Service & User Service)
+- Une base de données MySQL (StatefulSet)
+- Une configuration complète Kubernetes (Namespace, RBAC, Ingress, Secrets)
 
 ---
 
 # 🏗 Architecture
 
 ```
-Utilisateur
-    ↓
-Frontend (Angular - NodePort)
-    ↓
-Backend (Node.js / Express - ClusterIP)
-    ↓
-MySQL (StatefulSet + PersistentVolume)
+Client (Browser)
+        ↓
+      Ingress
+        ↓
+   Frontend (Angular)
+        ↓
+────────────────────────────────
+│                              │
+Task Service               User Service
+(Node.js / Express)       (Node.js / Express)
+│                              │
+─────────────── MySQL (StatefulSet) ───────────────
 ```
 
 ---
 
-# 🛠 Stack Technique
+# 🧩 Microservices
 
-## Frontend
-- Angular
+## 🎨 Frontend
+- Angular 20
+- Standalone Components
+- Signals
 - HttpClient
-- Déployé via Docker
-- Exposé via Service NodePort
-
-## Backend
-- Node.js
-- Express
-- Connexion MySQL
-- Variables d’environnement via Kubernetes Secrets
-
-## Base de données
-- MySQL 8
-- StatefulSet
-- PersistentVolume + PersistentVolumeClaim
-- Initialisation automatique
-
-## Orchestration
-- Kubernetes
-- Minikube (en local)
+- Dockerisé
+- Exposé via Ingress
 
 ---
 
-# 📁 Structure du projet
+## 📝 Task Service
+- CRUD des tâches
+- Gestion des permissions
+- Accès MySQL
+- Vérification rôle admin
 
-```
-projet-virtualisation/
-│
-├── task-manager-front/
-│   ├── Dockerfile
-│   └── code Angular
-│
-├── task-manager-back/
-│   ├── Dockerfile
-│   └── code Express
-│
-│
-└── k8s/
-    ├── front-deployment.yaml
-    ├── front-service.yaml
-    ├── back-deployment.yaml
-    ├── back-service.yaml
-    ├── mysql-statefulset.yaml
-    ├── mysql-secret.yaml
-    ├── mysql-service.yaml
-    ├── mysql-storage.yaml
-    └── mysql-configmap.yaml
-```
+Endpoints principaux :
+- GET /api/tasks
+- POST /api/tasks
+- PUT /api/tasks/:id
+- DELETE /api/tasks/:id
+- GET /api/tasks/admin
+
+---
+
+## 👤 User Service
+- Création utilisateur
+- Attribution rôle (admin / user)
+- Récupération liste utilisateurs
+
+Endpoints principaux :
+- POST /api/users
+- GET /api/users/all
+
+---
+
+## 🗄 Base de données
+
+- MySQL 8
+- Déployé en StatefulSet
+- PersistentVolumeClaim
+- ConfigMap (configuration)
+- Secret (credentials)
+
+---
+
+# ☸ Kubernetes
+
+Dossier : `task-manager-kubernetes/`
+
+## 📦 Ressources déployées
+
+- namespace.yaml
+- front-deployment.yaml
+- front-service.yaml
+- back-deployment.yaml
+- back-service.yaml
+- back-user-deployment.yaml
+- back-user-service.yaml
+- mysql-statefulset.yaml
+- mysql-configmap.yaml
+- mysql-secret.yaml
+- ingress.yaml
+- serviceaccount.yaml
+- rbac-admin-role.yaml
+- rbac-developer-role.yaml
+- rbac-viewer-role.yaml
+- rbac-bindings.yaml
+
+---
+
+# 🔐 RBAC
+
+Trois rôles Kubernetes sont configurés :
+
+- 👑 Admin → accès complet
+- 👨‍💻 Developer → gestion deployments/services
+- 👀 Viewer → accès lecture seule
+
+Utilisation de :
+- ServiceAccount
+- Roles
+- RoleBindings
 
 ---
 
 # ⚙️ Prérequis
 
-- Docker installé
-- Minikube installé
-- kubectl installé
+- Docker
+- Minikube
+- kubectl
 - Compte Docker Hub
 
 ---
 
 # 🚀 Lancer le projet
 
-## 1️⃣ Cloner le projet
+## 1️⃣ Cloner le repository
 
 ```bash
 git clone https://github.com/ManarDEHMANI/projet-virtualisation.git
@@ -105,62 +144,101 @@ cd projet-virtualisation
 minikube start
 ```
 
-Vérifier que tout est bien lancé :
+Activer Ingress :
 
 ```bash
-minikube status
+minikube addons enable ingress
 ```
 
 ---
 
-## 3️⃣ Déployer l'application sur Kubernetes
+## 3️⃣ Déployer le namespace
+
+```bash
+kubectl apply -f task-manager-kubernetes/namespace.yaml
+```
+
+---
+
+## 4️⃣ Déployer toutes les ressources
 
 ```bash
 kubectl apply -f task-manager-kubernetes/
 ```
 
-Vérifier que tous les pods sont en `Running` :
+---
+
+## 5️⃣ Vérifier le déploiement
 
 ```bash
-kubectl get pods
+kubectl get pods -n task-manager
+kubectl get svc -n task-manager
+kubectl get ingress -n task-manager
 ```
 
 ---
 
-## (Optionnel) Vérifier le backend
+# 🌍 Accès à l'application
 
-Pour tester le backend localement :
+Via Ingress :
 
-```bash
-kubectl port-forward deployment/task-manager-back 3001:3000
+```
+http://taskmanager.local
 ```
 
-Puis :
+Si nécessaire, ajouter dans `/etc/hosts` :
+
+```
+<minikube-ip> taskmanager.local
+```
+
+Obtenir l’IP :
 
 ```bash
-curl http://localhost:3001/api/tasks
+minikube ip
 ```
 
 ---
 
-# 🌍 Accéder à l'application
+# 🧠 Concepts Kubernetes utilisés
 
-Récupérer l'URL du frontend :
-
-```bash
-minikube service task-manager-front-service
-```
-
-Si le navigateur ne s’ouvre pas automatiquement, copier l’URL affichée et l’ouvrir manuellement.
-
----
-
-# ✅ Statut
-
-✔ Frontend déployé  
-✔ Backend connecté à MySQL  
-✔ Base persistante  
-✔ Communication interne fonctionnelle  
+- Namespace isolation
+- Microservices architecture
+- StatefulSet
+- Persistent storage
+- ConfigMap
+- Secret
+- RBAC
+- ServiceAccount
+- Ingress Controller
+- ClusterIP Services
 
 ---
 
+# 📦 Images Docker
+
+Les images utilisées sont publiées sur Docker Hub :
+
+- task-manager-front
+- task-manager-back
+- task-manager-back-user
+
+---
+
+# 🎯 Objectif pédagogique
+
+Ce projet démontre :
+
+- Architecture microservices
+- Séparation frontend/backend
+- Sécurisation avec RBAC
+- Gestion des secrets
+- Déploiement Kubernetes complet
+- Orchestration d’un système fullstack
+
+---
+
+# 👨‍💻 Auteur
+
+DEHMANI Manar et SIARRI Julie
+Projet réalisé dans le cadre du module Virtualisation / Kubernetes.
