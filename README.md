@@ -235,6 +235,7 @@ Dans ce cas, il suffit de redémarrer les microservices backend :
 ```bash
 kubectl rollout restart deployment task-manager-back -n task-manager
 kubectl rollout restart deployment task-manager-back-user -n task-manager
+``
 
 ---
 
