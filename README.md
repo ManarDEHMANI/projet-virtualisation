@@ -220,6 +220,22 @@ minikube ip
 
 ---
 
+# ⚠️ Problème possible au premier lancement
+
+Lors du premier déploiement, il est possible que l’application ne fonctionne pas immédiatement après la création d’un utilisateur (erreur 500 visible dans la console du navigateur).
+
+Cela peut se produire si :
+
+- Le backend démarre
+- Mais la base de données MySQL n’est pas encore totalement prête
+- Le backend tente d’établir la connexion trop tôt
+
+Dans ce cas, il suffit de redémarrer les microservices backend :
+
+```bash
+kubectl rollout restart deployment task-manager-back -n task-manager
+kubectl rollout restart deployment task-manager-back-user -n task-manager
+
 # 🧠 Concepts Kubernetes utilisés
 
 - Namespace isolation
