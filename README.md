@@ -236,6 +236,8 @@ Dans ce cas, il suffit de redémarrer les microservices backend :
 kubectl rollout restart deployment task-manager-back -n task-manager
 kubectl rollout restart deployment task-manager-back-user -n task-manager
 
+---
+
 # 🧠 Concepts Kubernetes utilisés
 
 - Namespace isolation
